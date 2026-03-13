@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 50px auto; padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; }
+        input[type='text'] { width: 70%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; }
+        ul { list-style: none; padding: 0; }
+        li { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #ddd; }
+        .completed { text-decoration: line-through; color: grey; }
+        @media (max-width: 600px) {
+            input[type='text'] { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <input type="text" id="todo-input" placeholder="Add a new task...">
+        <button id="add-button">Add</button>
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        const input = document.getElementById('todo-input');
+        const addButton = document.getElementById('add-button');
+        const todoList = document.getElementById('todo-list');
+
+        // Load todos from local storage
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        function renderTodos() {
+            todoList.innerHTML = '';
+            todos.forEach((todo, index) => {
+                const li = document.createElement('li');
+                li.textContent = todo.text;
+                li.className = todo.completed ? 'completed' : '';
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteTodo(index);
+                li.appendChild(deleteButton);
+                li.onclick = () => toggleComplete(index);
+                todoList.appendChild(li);
+            });
+        }
+
+        function addTodo() {
+            const text = input.value;
+            if (text) {
+                todos.push({ text, completed: false });
+                input.value = '';
+                saveTodos();
+                renderTodos();
+            }
+        }
+
+        function deleteTodo(index) {
+            todos.splice(index, 1);
+            saveTodos();
+            renderTodos();
+        }
+
+        function toggleComplete(index) {
+            todos[index].completed = !todos[index].completed;
+            saveTodos();
+            renderTodos();
+        }
+
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        addButton.onclick = addTodo;
+        renderTodos();
+    </script>
+</body>
+</html>
